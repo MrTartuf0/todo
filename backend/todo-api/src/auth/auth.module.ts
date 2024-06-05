@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import 'dotenv/config'
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas/user.schema';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -19,11 +20,11 @@ import { User, UserSchema } from 'src/schemas/user.schema';
     ConfigModule.forRoot(),
     PassportModule,
     JwtModule.register({
-      secret: process.env.SECRET_JWT,
       signOptions: { expiresIn: '1h' },
+      secret: process.env.SECRET_JWT
     })
   ],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [AuthService, JwtStrategy]
 })
 export class AuthModule {}
