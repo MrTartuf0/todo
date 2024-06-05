@@ -5,6 +5,8 @@ import { User } from 'src/schemas/user.schema';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { LoginPayloadDTO } from './dto/jwt.dto';
+import validator from 'validator';
 
 @Injectable()
 export class AuthService {
@@ -35,24 +37,28 @@ export class AuthService {
      * @param authPayloadDto 
      * @returns 
      */
-    async getJwt(authPayloadDto: AuthPayloadDTO): Promise<string> {
-        const { username, email, password } = authPayloadDto;
+        async login(loginPayload: LoginPayloadDTO): Promise<string> {
+            const { identifier, password } = loginPayload;
 
-        const user = await this.userModel.findOne({ $or: [{ username }, { email }] }).exec();
+            const isEmail = validator.isEmail(identifier);
 
-        if (!user) {
-            throw new NotFoundException('User not found');
+            const user = await this.userModel.findOne(
+                isEmail ? { email: identifier } : { username: identifier }
+            ).exec();
+
+            if (!user) {
+                throw new NotFoundException('User not found');
+            }
+
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordValid) {
+                throw new UnauthorizedException('Invalid credentials');
+            }
+
+            const payload = { username: user.username, sub: user._id };
+            const token = this.jwtService.sign(payload);
+
+            return token;
         }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-            throw new UnauthorizedException('Invalid credentials');
-        }
-
-        const payload = { username: user.username, sub: user._id };
-        const token = this.jwtService.sign(payload);
-
-        return token;
-    }
 }

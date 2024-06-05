@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Req, UseGuards, UsePipes, ValidationPipe }
 import { AuthPayloadDTO } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { JwtGuard } from 'src/jwt/jwt.guard';
+import { LoginPayloadDTO } from './dto/jwt.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -20,13 +21,13 @@ export class AuthController {
 
     /**
      * 
-     * @param authPayload 
+     * @param loginPayload 
      * @returns 
      */
-      @Post('getJwt')
+      @Post('login')
       @UsePipes(new ValidationPipe())
-      getJwt(@Body() authPayload: AuthPayloadDTO){
-        return this.authService.getJwt(authPayload)
+      getJwt(@Body() loginPayload: LoginPayloadDTO){
+        return this.authService.login(loginPayload)
       }
 
       /**
