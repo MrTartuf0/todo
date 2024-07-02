@@ -3,6 +3,7 @@ import { AuthPayloadDTO } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { JwtGuard } from 'src/jwt/jwt.guard';
 import { LoginPayloadDTO } from './dto/jwt.dto';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -35,9 +36,9 @@ export class AuthController {
        * @param req 
        * @returns 
        */
-      @Get('test')
+      @Get('todos')
       @UseGuards(JwtGuard)
       test(@Req() req:Request){
-        return "hello!"
+        return this.authService.getTodo(req.user)
       }
 }

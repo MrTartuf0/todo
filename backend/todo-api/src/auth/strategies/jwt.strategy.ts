@@ -17,7 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy){
      * @returns 
      */
     validate(payload: any){
-        console.log("Inside JWT strategy Validate")
         return payload
     }
 }
